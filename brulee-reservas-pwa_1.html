@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#B85C2A">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Brûlée">
+<link rel="manifest" href="/manifest.json">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<title>Brûlée — Reservas</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#f5f5f0;min-height:100vh;max-width:480px;margin:0 auto;}
+:root{
+  --bg:#ffffff;--bg2:#f5f5f0;--bg3:#eeede8;
+  --text:#1a1a1a;--text2:#666;--text3:#999;
+  --border:#e0ddd8;--border2:#ccc;
+  --accent:#B85C2A;--accent-bg:#FAEEDA;--accent-text:#854F0B;
+  --green-bg:#EAF3DE;--green-text:#3B6D11;--green-border:#97C459;
+  --blue-bg:#E6F1FB;--blue-text:#185FA5;
+  --red-bg:#FCEBEB;--red-text:#A32D2D;--red-border:#F7C1C1;
+  --radius:12px;--radius-sm:8px;--radius-xs:6px;
+}
+.app{background:var(--bg2);min-height:100vh;}
+.hdr{background:var(--bg);padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:11px;position:sticky;top:0;z-index:10;}
+.hdr-ico{width:34px;height:34px;border-radius:9px;background:var(--accent);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.hdr-ico svg{width:20px;height:20px;fill:white;}
+.hdr-body{flex:1;min-width:0;}
+.hdr-title{font-size:16px;font-weight:600;color:var(--text);}
+.hdr-sub{font-size:12px;color:var(--text2);margin-top:1px;}
+.hdr-back{background:none;border:none;cursor:pointer;padding:4px;color:var(--text2);display:flex;align-items:center;font-size:22px;margin-right:2px;}
+
+.view{display:none;min-height:100vh;}
+.view.on{display:block;}
+.pad{padding:14px;}
+
+.sec-lbl{font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.7px;margin:14px 0 8px;}
+
+.card{background:var(--bg);border-radius:var(--radius);border:1px solid var(--border);margin-bottom:10px;overflow:hidden;}
+
+.act-row{padding:12px 14px;display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none;}
+.act-ico-wrap{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0;}
+.act-meta{flex:1;min-width:0;}
+.act-name{font-size:14px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.act-sub{font-size:12px;color:var(--text2);margin-top:2px;}
+.settings-btn{background:none;border:none;cursor:pointer;padding:6px;color:var(--text3);font-size:18px;display:flex;align-items:center;flex-shrink:0;}
+.chv{font-size:14px;color:var(--text3);transition:transform .2s;flex-shrink:0;display:flex;align-items:center;}
+.chv.op{transform:rotate(180deg);}
+
+.sub-list{border-top:1px solid var(--border);display:none;}
+.sub-list.op{display:block;}
+.sub-item{padding:10px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:9px;cursor:pointer;user-select:none;}
+.sub-item:last-child{border-bottom:none;}
+.sub-item:active{background:var(--bg2);}
+.ava{width:31px;height:31px;border-radius:50%;background:var(--accent-bg);color:var(--accent-text);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;}
+.si-info{flex:1;min-width:0;}
+.si-name{font-size:13px;font-weight:600;color:var(--text);}
+.si-det{font-size:11px;color:var(--text2);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.dg{background:#639922;}.da{background:#EF9F27;}.db{background:#378ADD;}
+
+.add-sub-btn{padding:10px 14px;display:flex;align-items:center;gap:8px;color:var(--text2);font-size:13px;cursor:pointer;user-select:none;}
+.add-sub-btn:active{background:var(--bg2);}
+
+.dashed-btn{display:flex;align-items:center;gap:8px;padding:12px 14px;background:var(--bg);border:1px dashed var(--border2);border-radius:var(--radius);color:var(--text2);font-size:13px;cursor:pointer;width:100%;margin-top:4px;}
+.dashed-btn:active{background:var(--bg2);}
+
+.fab-wrap{display:flex;justify-content:flex-end;margin:14px 0 6px;}
+.fab{background:var(--accent);color:white;border:none;border-radius:50px;padding:11px 20px;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;box-shadow:0 2px 12px rgba(184,92,42,.25);}
+.fab:active{transform:scale(.97);}
+
+/* CONFIG */
+.cfg-section{background:var(--bg);border-radius:var(--radius);border:1px solid var(--border);margin-bottom:10px;padding:14px;}
+.cfg-label{font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;}
+.cfg-input{width:100%;border:1px solid var(--border2);border-radius:var(--radius-sm);padding:9px 12px;font-size:14px;background:var(--bg);color:var(--text);outline:none;}
+.cfg-input:focus{border-color:var(--accent);}
+
+/* ICON PICKER */
+.ico-preview-row{display:flex;align-items:center;gap:12px;}
+.ico-preview-box{width:54px;height:54px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:30px;border:1px solid var(--border);flex-shrink:0;}
+.ico-toggle-btn{font-size:13px;color:var(--blue-text);background:none;border:none;cursor:pointer;padding:0;font-family:inherit;font-weight:500;}
+.ico-toggle-hint{font-size:11px;color:var(--text3);margin-top:3px;}
+.ico-panel{margin-top:10px;border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;display:none;}
+.ico-panel.op{display:block;}
+.ico-tabs{display:flex;overflow-x:auto;background:var(--bg2);border-bottom:1px solid var(--border);scrollbar-width:none;}
+.ico-tabs::-webkit-scrollbar{display:none;}
+.ico-tab{padding:8px 14px;font-size:12px;color:var(--text2);cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent;flex-shrink:0;}
+.ico-tab.sel{color:var(--accent);border-bottom-color:var(--accent);font-weight:600;}
+.ico-grid{display:grid;grid-template-columns:repeat(7,1fr);max-height:190px;overflow-y:auto;}
+.ico-cell{aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:23px;cursor:pointer;}
+.ico-cell:active{background:var(--bg2);}
+.ico-cell.sel{background:var(--accent-bg);}
+
+/* FIELD BLOCKS */
+.field-block{background:var(--bg);border-radius:var(--radius);border:1px solid var(--border);margin-bottom:9px;overflow:hidden;}
+.field-hdr{padding:10px 13px;display:flex;align-items:center;justify-content:space-between;gap:8px;}
+.field-name{font-size:13px;font-weight:600;color:var(--text);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.type-badge{font-size:10px;color:var(--text2);background:var(--bg2);padding:2px 7px;border-radius:20px;flex-shrink:0;}
+.field-acts{display:flex;align-items:center;gap:5px;flex-shrink:0;}
+.ib{width:28px;height:28px;border-radius:7px;border:1px solid var(--border);background:var(--bg);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;color:var(--text2);}
+.ib:active{transform:scale(.95);}
+.ib-del{color:var(--red-text);border-color:var(--red-border);background:var(--red-bg);}
+.ib-add{color:var(--green-text);border-color:var(--green-border);background:var(--green-bg);}
+.ib-edit{color:var(--blue-text);border-color:#B5D4F4;background:var(--blue-bg);}
+.opts-wrap{border-top:1px solid var(--border);padding:10px 13px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;}
+.opt-chip{display:flex;align-items:center;gap:4px;background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:5px 9px 5px 12px;font-size:12px;color:var(--text);}
+.opt-chip span{cursor:pointer;}
+.opt-chip button{background:none;border:none;cursor:pointer;color:var(--red-text);font-size:16px;line-height:1;padding:0;display:flex;align-items:center;}
+.add-opt-btn{display:flex;align-items:center;gap:3px;background:var(--green-bg);border:1px dashed var(--green-border);border-radius:20px;padding:5px 10px;font-size:12px;color:var(--green-text);cursor:pointer;}
+
+/* FORM */
+.form-block{background:var(--bg);border-radius:var(--radius);border:1px solid var(--border);margin-bottom:10px;overflow:hidden;}
+.form-lbl{padding:10px 14px 0;font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;}
+.form-input{width:100%;border:none;outline:none;padding:8px 14px 12px;font-size:15px;background:transparent;color:var(--text);}
+.form-date{width:100%;border:none;outline:none;padding:8px 14px 12px;font-size:15px;background:transparent;color:var(--text);}
+.chips-wrap{padding:7px 14px 12px;display:flex;flex-wrap:wrap;gap:6px;}
+.chip{padding:7px 14px;border:1px solid var(--border2);border-radius:20px;font-size:13px;cursor:pointer;background:var(--bg);color:var(--text);user-select:none;}
+.chip:active{transform:scale(.97);}
+.chip.sel{background:var(--accent-bg);border-color:var(--accent);color:var(--accent-text);font-weight:600;}
+.save-btn{width:100%;background:var(--accent);color:white;border:none;border-radius:var(--radius);padding:14px;font-size:15px;font-weight:600;cursor:pointer;margin-top:6px;}
+.save-btn:active{transform:scale(.98);}
+
+/* DETAIL */
+.detail-row{display:flex;justify-content:space-between;align-items:flex-start;padding:9px 0;border-bottom:1px solid var(--border);}
+.detail-row:last-child{border-bottom:none;}
+.detail-key{font-size:12px;color:var(--text2);}
+.detail-val{font-size:13px;color:var(--text);font-weight:600;text-align:right;max-width:58%;}
+
+.row-btns{display:flex;gap:8px;margin-top:14px;margin-bottom:20px;}
+.btn-sec{flex:1;padding:11px;border:1px solid var(--border2);border-radius:var(--radius-sm);background:var(--bg);color:var(--text);font-size:13px;cursor:pointer;font-family:inherit;}
+.btn-sec:active{background:var(--bg2);}
+.btn-pri{flex:2;padding:11px;border:none;border-radius:var(--radius-sm);background:var(--accent);color:white;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;}
+.btn-pri:active{transform:scale(.98);}
+.btn-danger{color:var(--red-text);}
+
+/* BOTTOM SHEET */
+.overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.4);display:none;align-items:flex-end;justify-content:center;z-index:100;}
+.overlay.on{display:flex;}
+.sheet{background:var(--bg);border-radius:20px 20px 0 0;width:100%;max-width:480px;padding:18px 16px 36px;}
+.sh-handle{width:38px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 16px;}
+.sh-title{font-size:16px;font-weight:600;color:var(--text);margin-bottom:13px;}
+.sh-input{width:100%;padding:10px 13px;border:1px solid var(--border2);border-radius:var(--radius-sm);font-size:15px;background:var(--bg);color:var(--text);outline:none;font-family:inherit;}
+.sh-input:focus{border-color:var(--accent);}
+.sh-btns{display:flex;gap:8px;margin-top:12px;}
+.sh-cancel{flex:1;padding:11px;border:1px solid var(--border2);border-radius:var(--radius-sm);background:var(--bg);color:var(--text);font-size:14px;cursor:pointer;font-family:inherit;}
+.sh-ok{flex:2;padding:11px;border:none;border-radius:var(--radius-sm);background:var(--accent);color:white;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;}
+.sh-ok:active{transform:scale(.98);}
+.type-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:12px;}
+.type-opt{padding:9px;border:1px solid var(--border2);border-radius:var(--radius-sm);font-size:13px;cursor:pointer;text-align:center;background:var(--bg);color:var(--text);font-family:inherit;}
+.type-opt.sel{background:var(--accent-bg);border-color:var(--accent);color:var(--accent-text);font-weight:600;}
+
+/* TOAST */
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:#2C2C2A;color:white;padding:10px 20px;border-radius:20px;font-size:13px;font-weight:500;z-index:200;opacity:0;transition:opacity .25s;white-space:nowrap;pointer-events:none;}
+.toast.on{opacity:1;}
+
+/* EMPTY STATE */
+.empty{text-align:center;padding:48px 20px;color:var(--text2);}
+.empty-ico{font-size:40px;margin-bottom:10px;}
+.empty-txt{font-size:14px;}
+
+/* SCROLL FIX */
+.scroll-pad{height:80px;}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+
+<!-- VISTA LISTA -->
+<div class="view on" id="v-list">
+  <div class="hdr">
+    <div class="hdr-ico">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M2 21h18v-2H2v2zM20 8H4v5a6 6 0 0 0 6 6h4a6 6 0 0 0 6-6V8zm-2 5a4 4 0 0 1-4 4h-4a4 4 0 0 1-4-4v-3h12v3zm2-9h-2V3h-2v1H8V3H6v1H4v1c0 .55.45 1 1 1h14c.55 0 1-.45 1-1V4z"/></svg>
+    </div>
+    <div class="hdr-body">
+      <div class="hdr-title">Brûlée — Reservas</div>
+      <div class="hdr-sub" id="list-sub">Cargando...</div>
+    </div>
+  </div>
+  <div class="pad">
+    <div class="sec-lbl">Actividades</div>
+    <div id="act-list"></div>
+    <button class="dashed-btn" onclick="goNewActivity()">
+      <span style="font-size:18px;line-height:1;">+</span> Crear nueva actividad
+    </button>
+    <div class="fab-wrap">
+      <button class="fab" onclick="goNewReserva()">
+        <span style="font-size:18px;line-height:1;">+</span> Nueva reserva
+      </button>
+    </div>
+    <div class="scroll-pad"></div>
+  </div>
+</div>
+
+<!-- VISTA CONFIG -->
+<div class="view" id="v-cfg">
+  <div class="hdr">
+    <button class="hdr-back" onclick="goList()" aria-label="Volver">&#8592;</button>
+    <div class="hdr-body">
+      <div class="hdr-title" id="cfg-hdr-title">Configurar</div>
+      <div class="hdr-sub">Editá nombre, ícono y campos</div>
+    </div>
+  </div>
+  <div class="pad" id="cfg-body"></div>
+</div>
+
+<!-- VISTA FORMULARIO -->
+<div class="view" id="v-form">
+  <div class="hdr">
+    <button class="hdr-back" onclick="goList()" aria-label="Volver">&#8592;</button>
+    <div class="hdr-body">
+      <div class="hdr-title" id="form-title">Nueva reserva</div>
+      <div class="hdr-sub" id="form-sub"></div>
+    </div>
+  </div>
+  <div class="pad" id="form-body"></div>
+</div>
+
+<!-- VISTA DETALLE -->
+<div class="view" id="v-detail">
+  <div class="hdr">
+    <button class="hdr-back" onclick="goList()" aria-label="Volver">&#8592;</button>
+    <div class="hdr-body">
+      <div class="hdr-title" id="det-title">Detalle</div>
+      <div class="hdr-sub" id="det-sub"></div>
+    </div>
+  </div>
+  <div class="pad" id="det-body"></div>
+</div>
+
+<!-- BOTTOM SHEET -->
+<div class="overlay" id="overlay">
+  <div class="sheet">
+    <div class="sh-handle"></div>
+    <div class="sh-title" id="sh-title"></div>
+    <div id="sh-extra"></div>
+    <input class="sh-input" id="sh-input" placeholder="">
+    <div class="sh-btns">
+      <button class="sh-cancel" onclick="closeSheet()">Cancelar</button>
+      <button class="sh-ok" onclick="confirmSheet()">Listo</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+</div>
+
+<script>
+// ── DATOS ──────────────────────────────────────────────────────────────────
+const STORE_KEY = 'brulee_data_v1';
+
+const ICON_CATS = [
+  {label:'Comida', icons:['🎂','🍰','🧁','🍫','🍓','🥐','🥧','🍮','🍩','🍪','🧇','🥞','🍦','🍨','🍧','🧃','🥤','☕','🫖','🍵','🍺','🥂','🍾','🥗','🧀','🥩','🍖','🥪','🍱','🫙']},
+  {label:'Eventos', icons:['🎉','🎊','🎁','🎈','🎀','🪅','🎭','🎪','🥳','🎶','🎵','🪩','✨','🌟','💫','🎠','🎡','🎢','🎯','🎲']},
+  {label:'Negocio', icons:['🛍️','🏪','📦','📋','📝','✏️','📌','📎','🗂️','💼','🪙','💳','💰','🧾','📊','📈','🖨️','📱','💻','🔑']},
+  {label:'Naturaleza', icons:['🌸','🌺','🌹','🌷','🌻','🍀','🌿','🌱','🪴','🌾','🍂','🍃','🌴','🌵','🪸','🦋','🐝','🌈','⭐','🌙']},
+  {label:'Hogar', icons:['🏠','🪑','🛋️','🛏️','🪞','🪟','🚪','🧹','🧺','🫧','🪣','🧴','🕯️','🪔','🔮','🎀','🧸','🪆','🖼️','🎨']},
+];
+
+const ICO_COLORS = {
+  '🎂':'#EAF3DE','🍰':'#EAF3DE','🧁':'#EAF3DE','🍫':'#FAEEDA','🪑':'#FAEEDA','🧀':'#FAEEDA',
+  '🎉':'#EEEDFE','🎊':'#EEEDFE','🎁':'#FBEAF0','☕':'#FAEEDA','🛍️':'#E6F1FB','🌸':'#FBEAF0',
+  '🌺':'#FBEAF0','🌹':'#FBEAF0','🌷':'#FBEAF0','🌻':'#EAF3DE','🍀':'#EAF3DE','🌿':'#EAF3DE',
+  '⭐':'#FAEEDA','🌟':'#FAEEDA','💫':'#FAEEDA','🎈':'#FBEAF0','🎶':'#EEEDFE','🎵':'#EEEDFE',
+};
+const DEFAULT_COLOR = '#E6F1FB';
+
+const DEFAULT_ACTS = [
+  {
+    id:'caja', name:'Caja dulce — Día del Padre', icon:'🎂', color:'#EAF3DE',
+    fields:[
+      {id:'cliente', label:'¿Quién encargó?', type:'text', options:[]},
+      {id:'pago', label:'Estado de pago', type:'chips', options:['Pagado','Seña','Pendiente','Cortesía']},
+      {id:'torta', label:'Tipo de torta', type:'chips', options:['Húmeda choc.','Chantilly','Selva negra','Sin torta']},
+      {id:'extras', label:'Extras', type:'chips', options:['Alfajores','Brownies','Muffins','Tarta','Sin extras']},
+      {id:'retira', label:'¿Cuándo retira?', type:'date', options:[]},
+      {id:'nota', label:'Nota adicional', type:'text', options:[]},
+    ],
+    reservas:[
+      {id:'r1', data:{cliente:'Laura Fernández', pago:'Pagado', torta:'Húmeda choc.', extras:'Alfajores', retira:'2025-06-20', nota:'Sin TACC'}},
+      {id:'r2', data:{cliente:'Roberto Morales', pago:'Seña', torta:'Chantilly', extras:'Brownies', retira:'2025-06-21', nota:''}},
+    ]
+  },
+  {
+    id:'mesa', name:'Reserva de mesa', icon:'🪑', color:'#FAEEDA',
+    fields:[
+      {id:'cliente', label:'¿Quién reserva?', type:'text', options:[]},
+      {id:'fecha', label:'Fecha y hora', type:'date', options:[]},
+      {id:'personas', label:'Personas', type:'chips', options:['1-2','3-4','5-6','7+']},
+      {id:'pago', label:'Estado', type:'chips', options:['Confirmada','Pendiente','Cancelada']},
+      {id:'ocasion', label:'Ocasión', type:'chips', options:['Cumpleaños','Aniversario','Sin ocasión','Otro']},
+      {id:'nota', label:'Nota', type:'text', options:[]},
+    ],
+    reservas:[
+      {id:'r3', data:{cliente:'María García', pago:'Confirmada', personas:'3-4', fecha:'2025-06-14', ocasion:'Cumpleaños', nota:'Mesa cerca de ventana'}},
+    ]
+  }
+];
+
+// ── ESTADO ──────────────────────────────────────────────────────────────────
+let acts = [];
+let currentAct = null;
+let pickerOpen = false;
+let currentCat = 0;
+let sheetCb = null;
+let sheetTypeCb = null;
+let selectedType = 'chips';
+let currentDetailIds = null;
+
+// ── PERSISTENCIA ────────────────────────────────────────────────────────────
+function save() {
+  try { localStorage.setItem(STORE_KEY, JSON.stringify(acts)); } catch(e) {}
+}
+function load() {
+  try {
+    const raw = localStorage.getItem(STORE_KEY);
+    acts = raw ? JSON.parse(raw) : JSON.parse(JSON.stringify(DEFAULT_ACTS));
+  } catch(e) {
+    acts = JSON.parse(JSON.stringify(DEFAULT_ACTS));
+  }
+}
+
+// ── UTILS ───────────────────────────────────────────────────────────────────
+function uid() { return 'id_' + Date.now() + '_' + Math.random().toString(36).slice(2,7); }
+function initials(n) { return n ? n.trim().split(/\s+/).slice(0,2).map(w=>w[0]).join('').toUpperCase() : '?'; }
+function statusDot(p) {
+  if (!p) return 'da';
+  const s = p.toLowerCase();
+  if (s==='pagado'||s==='confirmada') return 'dg';
+  if (s==='seña'||s==='con seña') return 'db';
+  return 'da';
+}
+function showView(id) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('on'));
+  document.getElementById(id).classList.add('on');
+  window.scrollTo(0,0);
+}
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('on');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove('on'), 2400);
+}
+
+// ── LISTA ───────────────────────────────────────────────────────────────────
+function goList() {
+  renderList();
+  showView('v-list');
+}
+
+function renderList() {
+  const total = acts.reduce((s,a) => s + a.reservas.length, 0);
+  document.getElementById('list-sub').textContent =
+    acts.length + ' actividad' + (acts.length!==1?'es':'') + ' · ' + total + ' reserva' + (total!==1?'s':'');
+
+  const el = document.getElementById('act-list');
+  if (acts.length === 0) {
+    el.innerHTML = `<div class="empty"><div class="empty-ico">📋</div><div class="empty-txt">Todavía no hay actividades.<br>Creá la primera con el botón de abajo.</div></div>`;
+    return;
+  }
+  el.innerHTML = acts.map(a => `
+    <div class="card">
+      <div class="act-row" onclick="toggleSub('${a.id}')">
+        <div class="act-ico-wrap" style="background:${a.color}">${a.icon}</div>
+        <div class="act-meta">
+          <div class="act-name">${esc(a.name)}</div>
+          <div class="act-sub">${a.reservas.length} reserva${a.reservas.length!==1?'s':''}</div>
+        </div>
+        <button class="settings-btn" onclick="event.stopPropagation();goCfg('${a.id}')" aria-label="Configurar actividad">&#9881;</button>
+        <div class="chv" id="chv-${a.id}">&#8964;</div>
+      </div>
+      <div class="sub-list" id="sub-${a.id}">
+        ${a.reservas.length === 0
+          ? '<div style="padding:12px 14px;font-size:13px;color:#999;">Sin reservas todavía</div>'
+          : a.reservas.map(r => `
+            <div class="sub-item" onclick="goDetail('${a.id}','${r.id}')">
+              <div class="ava">${initials(r.data.cliente||'')}</div>
+              <div class="si-info">
+                <div class="si-name">${esc(r.data.cliente||'Sin nombre')}</div>
+                <div class="si-det">${Object.entries(r.data).filter(([k,v])=>k!=='cliente'&&k!=='nota'&&v).map(([,v])=>esc(v)).join(' · ')}</div>
+              </div>
+              <div class="dot ${statusDot(r.data.pago)}"></div>
+            </div>`).join('')}
+        <div class="add-sub-btn" onclick="goNewReservaAct('${a.id}')">
+          <span style="font-size:16px;line-height:1;color:#B85C2A;">+</span>
+          <span>Agregar reserva</span>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function toggleSub(id) {
+  document.getElementById('sub-'+id).classList.toggle('op');
+  document.getElementById('chv-'+id).classList.toggle('op');
+}
+
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── CONFIG ───────────────────────────────────────────────────────────────────
+function goCfg(actId) {
+  currentAct = acts.find(a => a.id === actId);
+  pickerOpen = false; currentCat = 0;
+  document.getElementById('cfg-hdr-title').textContent = currentAct.name;
+  renderCfg();
+  showView('v-cfg');
+}
+
+function goNewActivity() {
+  const newAct = {
+    id: uid(), name: 'Nueva actividad', icon: '✨',
+    color: DEFAULT_COLOR,
+    fields: [
+      {id:'cliente', label:'¿Quién encargó?', type:'text', options:[]},
+      {id:'pago', label:'Estado de pago', type:'chips', options:['Pagado','Seña','Pendiente']},
+    ],
+    reservas: []
+  };
+  acts.push(newAct);
+  save();
+  currentAct = newAct;
+  pickerOpen = true; currentCat = 0;
+  document.getElementById('cfg-hdr-title').textContent = 'Nueva actividad';
+  renderCfg();
+  showView('v-cfg');
+}
+
+function renderCfg() {
+  const a = currentAct;
+  const tabs = ICON_CATS.map((c,i) =>
+    `<div class="ico-tab${i===currentCat?' sel':''}" onclick="switchCat(${i})">${c.label}</div>`).join('');
+  const cells = ICON_CATS[currentCat].icons.map(ic =>
+    `<div class="ico-cell${a.icon===ic?' sel':''}" onclick="setIcon('${ic}')">${ic}</div>`).join('');
+
+  let html = `
+    <div class="cfg-section">
+      <div class="cfg-label">Nombre de la actividad</div>
+      <input class="cfg-input" id="act-name-inp" value="${esc(a.name)}"
+        oninput="currentAct.name=this.value;document.getElementById('cfg-hdr-title').textContent=this.value;">
+    </div>
+    <div class="cfg-section">
+      <div class="cfg-label">Ícono</div>
+      <div class="ico-preview-row">
+        <div class="ico-preview-box" id="ico-prev" style="background:${a.color}">${a.icon}</div>
+        <div>
+          <button class="ico-toggle-btn" onclick="togglePicker()">
+            ${pickerOpen ? '✕ Cerrar selector' : '🎨 Elegir ícono'}
+          </button>
+          <div class="ico-toggle-hint">Tocá cualquier emoji</div>
+        </div>
+      </div>
+      <div class="ico-panel${pickerOpen?' op':''}">
+        <div class="ico-tabs">${tabs}</div>
+        <div class="ico-grid">${cells}</div>
+      </div>
+    </div>
+    <div class="sec-lbl">Campos del formulario</div>`;
+
+  a.fields.forEach((f, fi) => {
+    html += `
+      <div class="field-block">
+        <div class="field-hdr">
+          <span class="field-name">${esc(f.label)}</span>
+          <span class="type-badge">${f.type==='chips'?'opciones':f.type==='date'?'fecha':'texto'}</span>
+          <div class="field-acts">
+            <button class="ib ib-edit" onclick="editFieldName(${fi})" aria-label="Renombrar campo">✏️</button>
+            ${f.type==='chips'?`<button class="ib ib-add" onclick="addOpt(${fi})" aria-label="Agregar opción">+</button>`:''}
+            <button class="ib ib-del" onclick="delField(${fi})" aria-label="Eliminar campo">✕</button>
+          </div>
+        </div>
+        ${f.type==='chips' ? `
+          <div class="opts-wrap">
+            ${f.options.map((op,oi) => `
+              <div class="opt-chip">
+                <span onclick="editOpt(${fi},${oi})">${esc(op)}</span>
+                <button onclick="delOpt(${fi},${oi})" aria-label="Eliminar opción">×</button>
+              </div>`).join('')}
+            <button class="add-opt-btn" onclick="addOpt(${fi})">+ agregar</button>
+          </div>` : ''}
+      </div>`;
+  });
+
+  html += `
+    <button class="dashed-btn" onclick="addField()">
+      <span style="font-size:18px;line-height:1;">+</span> Agregar campo nuevo
+    </button>
+    <div class="row-btns">
+      <button class="btn-sec btn-danger" onclick="deleteActivity()">🗑 Eliminar</button>
+      <button class="btn-pri" onclick="saveCfg()">Guardar cambios</button>
+    </div>
+    <div class="scroll-pad"></div>`;
+
+  document.getElementById('cfg-body').innerHTML = html;
+}
+
+function togglePicker() { pickerOpen = !pickerOpen; renderCfg(); }
+function switchCat(i) { currentCat = i; renderCfg(); }
+function setIcon(ic) {
+  currentAct.icon = ic;
+  currentAct.color = ICO_COLORS[ic] || DEFAULT_COLOR;
+  renderCfg();
+}
+function editFieldName(fi) {
+  openSheet('Renombrar campo', 'Nombre del campo', val => {
+    currentAct.fields[fi].label = val; renderCfg(); toast('Campo renombrado ✓');
+  }, currentAct.fields[fi].label);
+}
+function delField(fi) { currentAct.fields.splice(fi,1); renderCfg(); toast('Campo eliminado'); }
+function addOpt(fi) {
+  openSheet('Agregar opción', 'Ej: Sin azúcar, Grande...', val => {
+    currentAct.fields[fi].options.push(val); renderCfg(); toast('Opción agregada ✓');
+  });
+}
+function editOpt(fi, oi) {
+  openSheet('Editar opción', 'Nueva opción...', val => {
+    currentAct.fields[fi].options[oi] = val; renderCfg(); toast('Opción editada ✓');
+  }, currentAct.fields[fi].options[oi]);
+}
+function delOpt(fi, oi) { currentAct.fields[fi].options.splice(oi,1); renderCfg(); }
+function addField() {
+  openSheetWithType('Nuevo campo', 'Nombre del campo', (val, type) => {
+    currentAct.fields.push({id: uid(), label: val, type, options: []});
+    renderCfg(); toast('Campo agregado ✓');
+  });
+}
+function deleteActivity() {
+  if (!confirm('¿Eliminar esta actividad y todas sus reservas?')) return;
+  acts = acts.filter(a => a.id !== currentAct.id);
+  save(); goList(); toast('Actividad eliminada');
+}
+function saveCfg() { save(); pickerOpen = false; goList(); toast('¡Guardado! ✓'); }
+
+// ── FORMULARIO ───────────────────────────────────────────────────────────────
+function goNewReserva() {
+  if (acts.length === 0) { toast('Primero creá una actividad'); return; }
+  currentAct = acts[0];
+  renderForm(null);
+  showView('v-form');
+}
+function goNewReservaAct(actId) {
+  currentAct = acts.find(a => a.id === actId);
+  renderForm(null);
+  showView('v-form');
+}
+function renderForm(reserva) {
+  document.getElementById('form-title').textContent = reserva ? 'Editar reserva' : 'Nueva reserva';
+  document.getElementById('form-sub').textContent = currentAct.name;
+  const d = reserva ? reserva.data : {};
+  let html = currentAct.fields.map(f => `
+    <div class="form-block">
+      <div class="form-lbl">${esc(f.label)}</div>
+      ${f.type==='text' ? `<input class="form-input" data-field="${f.id}" placeholder="Escribí aquí..." value="${esc(d[f.id]||'')}">` : ''}
+      ${f.type==='date' ? `<input class="form-date" type="date" data-field="${f.id}" value="${esc(d[f.id]||'')}">` : ''}
+      ${f.type==='chips' ? `<div class="chips-wrap">${f.options.map(op =>
+        `<div class="chip${d[f.id]===op?' sel':''}" onclick="selChip(this)">${esc(op)}</div>`
+      ).join('')}</div>` : ''}
+    </div>`).join('');
+  html += `<button class="save-btn" onclick="saveForm('${reserva ? reserva.id : ''}')">Guardar reserva</button>`;
+  html += '<div class="scroll-pad"></div>';
+  document.getElementById('form-body').innerHTML = html;
+}
+function selChip(el) {
+  el.closest('.chips-wrap').querySelectorAll('.chip').forEach(c => c.classList.remove('sel'));
+  el.classList.add('sel');
+}
+function saveForm(rid) {
+  const data = {};
+  document.querySelectorAll('#form-body [data-field]').forEach(el => { data[el.dataset.field] = el.value; });
+  document.querySelectorAll('#form-body .chip.sel').forEach(el => {
+    const lbl = el.closest('.form-block').querySelector('.form-lbl').textContent;
+    const f = currentAct.fields.find(f => f.label === lbl);
+    if (f) data[f.id] = el.textContent;
+  });
+  if (rid) {
+    const r = currentAct.reservas.find(r => r.id === rid);
+    if (r) r.data = data;
+  } else {
+    currentAct.reservas.push({id: uid(), data});
+  }
+  save(); goList(); toast('¡Reserva guardada! ✓');
+}
+
+// ── DETALLE ──────────────────────────────────────────────────────────────────
+function goDetail(actId, rid) {
+  currentAct = acts.find(a => a.id === actId);
+  const r = currentAct.reservas.find(r => r.id === rid);
+  currentDetailIds = {actId, rid};
+  document.getElementById('det-title').textContent = r.data.cliente || 'Detalle';
+  document.getElementById('det-sub').textContent = currentAct.name;
+  let html = `<div class="card" style="padding:14px;">`;
+  currentAct.fields.forEach(f => {
+    const v = r.data[f.id];
+    html += `<div class="detail-row"><span class="detail-key">${esc(f.label)}</span><span class="detail-val" style="${!v?'color:var(--text3);font-weight:400;':''}">${v ? esc(v) : '—'}</span></div>`;
+  });
+  html += `</div>
+    <div class="row-btns">
+      <button class="btn-sec btn-danger" onclick="delReserva()">🗑 Eliminar</button>
+      <button class="btn-pri" onclick="editReserva()">✏️ Editar</button>
+    </div>
+    <div class="scroll-pad"></div>`;
+  document.getElementById('det-body').innerHTML = html;
+  showView('v-detail');
+}
+function delReserva() {
+  if (!confirm('¿Eliminar esta reserva?')) return;
+  const {actId, rid} = currentDetailIds;
+  const a = acts.find(a => a.id === actId);
+  a.reservas = a.reservas.filter(r => r.id !== rid);
+  save(); goList(); toast('Reserva eliminada');
+}
+function editReserva() {
+  const {actId, rid} = currentDetailIds;
+  currentAct = acts.find(a => a.id === actId);
+  const r = currentAct.reservas.find(r => r.id === rid);
+  renderForm(r);
+  showView('v-form');
+}
+
+// ── BOTTOM SHEET ─────────────────────────────────────────────────────────────
+function openSheet(title, placeholder, cb, prefill='') {
+  sheetCb = cb; sheetTypeCb = null;
+  document.getElementById('sh-title').textContent = title;
+  document.getElementById('sh-input').placeholder = placeholder;
+  document.getElementById('sh-input').value = prefill;
+  document.getElementById('sh-extra').innerHTML = '';
+  document.getElementById('overlay').classList.add('on');
+  setTimeout(() => { const i=document.getElementById('sh-input'); i.focus(); i.select(); }, 150);
+}
+function openSheetWithType(title, placeholder, cb) {
+  sheetTypeCb = cb; sheetCb = null; selectedType = 'chips';
+  document.getElementById('sh-title').textContent = title;
+  document.getElementById('sh-input').placeholder = placeholder;
+  document.getElementById('sh-input').value = '';
+  document.getElementById('sh-extra').innerHTML = `
+    <div style="font-size:12px;color:#666;margin-bottom:8px;font-weight:600;">Tipo de campo</div>
+    <div class="type-grid">
+      <button class="type-opt sel" onclick="selType('chips',this)">Opciones (botones)</button>
+      <button class="type-opt" onclick="selType('text',this)">Texto libre</button>
+      <button class="type-opt" onclick="selType('date',this)">Fecha</button>
+    </div>`;
+  document.getElementById('overlay').classList.add('on');
+  setTimeout(() => document.getElementById('sh-input').focus(), 150);
+}
+function selType(t, el) {
+  selectedType = t;
+  document.querySelectorAll('.type-opt').forEach(o => o.classList.remove('sel'));
+  el.classList.add('sel');
+}
+function closeSheet() { document.getElementById('overlay').classList.remove('on'); }
+function confirmSheet() {
+  const val = document.getElementById('sh-input').value.trim();
+  if (!val) return;
+  closeSheet();
+  if (sheetCb) sheetCb(val);
+  else if (sheetTypeCb) sheetTypeCb(val, selectedType);
+}
+document.getElementById('sh-input').addEventListener('keydown', e => { if (e.key==='Enter') confirmSheet(); });
+document.getElementById('overlay').addEventListener('click', e => { if (e.target===document.getElementById('overlay')) closeSheet(); });
+
+// ── INIT ─────────────────────────────────────────────────────────────────────
+load();
+goList();
+</script>
+</body>
+</html>
